@@ -4,7 +4,7 @@ import numpy as np
 import os
 import sys
 sys.path.append()
-from utils import measure_distancee
+from utils import measure_distance
 
 class EstimadorMovimientoCam():
     def __init__(self,frame):
