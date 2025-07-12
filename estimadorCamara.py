@@ -29,6 +29,15 @@ class EstimadorMovimientoCam():
             mask = maskFeatures
         )
     
+    def add_adjust_position_to_tracks(self, tracks, camera_movement_per_frame):
+        for object, object_tracks in tracks.items():
+            for frameNum, track in enumerate(object_tracks):
+                for trackId, trackInfo in track.items():
+                    position = trackInfo['position']
+                    cameraMovement = camera_movement_per_frame[frameNum]
+                    positionAdjusted = (position[0]-cameraMovement[0],position[1]-cameraMovement[1])
+                    tracks[object][frameNum][trackId]['position_adjusted'] = positionAdjusted
+    
     def get_camera_movement(self,frames,readFromStub=False, stubPath=None):
         
         if readFromStub and stubPath is not None and os.path.exists(stubPath):
