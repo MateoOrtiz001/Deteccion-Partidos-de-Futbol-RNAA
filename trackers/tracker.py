@@ -253,20 +253,22 @@ class Tracker:
     def draw_team_control(self, frame, frame_num, team_ball_control):
         # Dibuja un rectángulo 
         overlay = frame.copy()
-        cv2.rectangle(overlay, (1350,850), (1900,970), (24,65,125),-1)
-        alpha = 0.7
-        cv2.addWeighted(overlay, frame, 1 - alpha, 0, frame)
+        cv2.rectangle(overlay, (1150,50), (1800,170), (125,65,24),-1)
+        alpha = 0.9
+        cv2.addWeighted(overlay, alpha , frame, 1 - alpha, 0, frame)
         
         team_ball_control_till_frame = team_ball_control[:frame_num+1]
         
         team_1_num_frames = team_ball_control_till_frame[team_ball_control_till_frame==1].shape[0]
         team_2_num_frames = team_ball_control_till_frame[team_ball_control_till_frame==2].shape[0]
+        team_1 = 0
+        team_2 = 0
+        if (team_1_num_frames!=0 and team_2_num_frames!=0):
+            team_1 = team_1_num_frames/(team_1_num_frames+team_2_num_frames)
+            team_2 = team_2_num_frames/(team_1_num_frames+team_2_num_frames)
         
-        team_1 = team_1_num_frames/(team_1_num_frames+team_2_num_frames)
-        team_2 = team_2_num_frames/(team_1_num_frames+team_2_num_frames)
-        
-        cv2.putText(frame, f"Posesión Equipo 1: {team_1*100:.2f}%", (1400,900), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,0),3)
-        cv2.putText(frame, f"Posesión Equipo 2: {team_2*100:.2f}%", (1400,950), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,0),3)
+        cv2.putText(frame, f"Posesion Equipo 1: {team_1*100:.2f}%", (1200,100), cv2.FONT_HERSHEY_SIMPLEX, 1, (250,250,250),3)
+        cv2.putText(frame, f"Posesion Equipo 2: {team_2*100:.2f}%", (1200,150), cv2.FONT_HERSHEY_SIMPLEX, 1, (250,250,250),3)
         
         return frame
 
@@ -325,7 +327,7 @@ class Tracker:
                 
             
             # Dibujar Control del balón
-            frame = self.draw_team_control(frame, frame_num, team_ball_control)
+            annotated_frame = self.draw_team_control(annotated_frame, frame_num, team_ball_control)
             
 
             # Añadir frame anotado a la lista de salida
