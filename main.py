@@ -5,6 +5,7 @@ from trackers import Tracker
 import cv2  
 import numpy as np
 from assigner import TeamAssigner
+from asignadorJugador import PlayerBallAssigner
 
 
 def main():
@@ -16,7 +17,7 @@ def main():
     """
     # ===== CARGA Y PROCESAMIENTO DEL VIDEO =====
     # Leer video de entrada y cargar todos los frames en memoria
-    video_frames = read_video("input_videos/08fd33_4.mp4")
+    video_frames = read_video("videos/08fd33_4.mp4")
 
     # Inicializar el tracker con el modelo YOLO entrenado
     tracker = Tracker("model/best.pt")
@@ -28,6 +29,9 @@ def main():
         read_from_stub=True, 
         stub_path="stubs/track_stubs.pkl"
     )
+    
+    # Interpolación de la posición de la pelota
+    tracks['ball'] = tracker.interpolate_ball_positions(tracks['ball'])
 
     # ===== ASIGNACIÓN DE EQUIPOS POR COLOR =====
     # Inicializar el asignador de equipos basado en colores de camisetas
@@ -49,10 +53,29 @@ def main():
             # Almacenar información del equipo en los datos de tracking
             tracks['players'][frame_num][player_id]['team'] = team 
             tracks['players'][frame_num][player_id]['team_color'] = team_assigner.team_colors[team]
+            
+    # Asigna el jugador que tiene el balón
+    
+    player_assigner =  PlayerBallAssigner()
+    team_ball_control = []
+    for frame_num, player_track in enumerate(tracks['players']):
+        ball_bbox = tracks['ball'][frame_num][1]['bbox']
+        assigned_player = player_assigner.assign_ball_to_player(player_track,ball_bbox)
+        
+        if assigned_player != -1:
+            tracks['players'][frame_num][assigned_player]['has_ball'] = True
+            team_ball_control.append(tracks['players'][frame_num][assigned_player]['team'])
+        else:
+            if team_ball_control:
+                team_ball_control.append(team_ball_control[-1])
+            else:
+                # Decide qué valor inicial poner, por ejemplo 0 o None
+                team_ball_control.append(0)
+    team_ball_control = np.array(team_ball_control)
 
     # ===== GENERACIÓN DEL VIDEO DE SALIDA =====
     # Dibujar anotaciones (elipses con colores de equipo, IDs, etc.) en todos los frames
-    output_video_frames = tracker.draw_annotations(video_frames, tracks)
+    output_video_frames = tracker.draw_annotations(video_frames, tracks, team_ball_control)
 
     # Guardar el video procesado con todas las anotaciones
     save_video(output_video_frames, "output_videos/08fd33_4.mp4") 
