@@ -6,6 +6,8 @@ import cv2
 import numpy as np
 from assigner import TeamAssigner
 from asignadorJugador import PlayerBallAssigner
+from mov_camera import EstimadorMovimientoCam
+from perspective_transformer import ViewTransformer
 
 
 def main():
@@ -29,6 +31,19 @@ def main():
         read_from_stub=True, 
         stub_path="stubs/track_stubs.pkl"
     )
+    
+    # Obteniendo posiciones de objetos
+    tracker.add_possition_to_tracks(tracks)
+    
+    # Estimación del movimiento de la cámara
+    camera_movement_estimator = EstimadorMovimientoCam(video_frames[0])
+    camera_movement_per_frame = camera_movement_estimator.get_camera_movement(video_frames, readFromStub=True,stubPath='stubs/camera_movement_stub.pk1')
+    
+    camera_movement_estimator.add_adjust_position_to_tracks(tracks,camera_movement_per_frame)
+    
+    # Transformador de perspectiva
+    view_transformer = ViewTransformer()
+    view_transformer.add_transformed_position_2_tracks(tracks)
     
     # Interpolación de la posición de la pelota
     tracks['ball'] = tracker.interpolate_ball_positions(tracks['ball'])
@@ -76,6 +91,9 @@ def main():
     # ===== GENERACIÓN DEL VIDEO DE SALIDA =====
     # Dibujar anotaciones (elipses con colores de equipo, IDs, etc.) en todos los frames
     output_video_frames = tracker.draw_annotations(video_frames, tracks, team_ball_control)
+    
+    # Dibuja el movimiento de la cámara
+    output_video_frames = camera_movement_estimator.draw_camera_movement(output_video_frames,camera_movement_per_frame)
 
     # Guardar el video procesado con todas las anotaciones
     save_video(output_video_frames, "output_videos/08fd33_4.mp4") 
