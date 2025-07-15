@@ -91,8 +91,8 @@ class EstimadorMovimientoCam():
             cv2.addWeighted(overlay,alpha,frame,1-alpha,0,frame)
             
             xMov, yMov = camera_movement_per_frame[frameNum]
-            frame = cv2.putText(frame,f"Movimiento de cámara X: {xMov: 2f}", (10,30), cv2.FONT_HERSHEY_SIMPLEX,0.6, (0,0,0),2)
-            frame = cv2.putText(frame,f"Movimiento de cámara Y: {yMov: 2f}", (10,60), cv2.FONT_HERSHEY_SIMPLEX,0.6, (0,0,0),2)
+            frame = cv2.putText(frame,f"Movimiento de camara X: {xMov: 2f}", (10,30), cv2.FONT_HERSHEY_SIMPLEX,0.6, (0,0,0),2)
+            frame = cv2.putText(frame,f"Movimiento de camara Y: {yMov: 2f}", (10,60), cv2.FONT_HERSHEY_SIMPLEX,0.6, (0,0,0),2)
             
             output_frames.append(frame)
             

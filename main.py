@@ -8,6 +8,7 @@ from assigner import TeamAssigner
 from asignadorJugador import PlayerBallAssigner
 from mov_camera import EstimadorMovimientoCam
 from perspective_transformer import ViewTransformer
+from info import SpeedAndDistanceEstimator
 
 
 def main():
@@ -47,6 +48,10 @@ def main():
     
     # Interpolación de la posición de la pelota
     tracks['ball'] = tracker.interpolate_ball_positions(tracks['ball'])
+    
+    # Estimador de información (después de tener las posiciones transformadas)
+    speed_and_distance_estimator = SpeedAndDistanceEstimator()
+    speed_and_distance_estimator.add_speed_and_distance_2_tracks(tracks)
 
     # ===== ASIGNACIÓN DE EQUIPOS POR COLOR =====
     # Inicializar el asignador de equipos basado en colores de camisetas
@@ -94,6 +99,9 @@ def main():
     
     # Dibuja el movimiento de la cámara
     output_video_frames = camera_movement_estimator.draw_camera_movement(output_video_frames,camera_movement_per_frame)
+    
+    # Dibuja la información de los jugadores
+    speed_and_distance_estimator.draw_speed_and_distance(output_video_frames,tracks)
 
     # Guardar el video procesado con todas las anotaciones
     save_video(output_video_frames, "output_videos/08fd33_4.mp4") 
