@@ -44,7 +44,7 @@ Un sistema inteligente de análisis de partidos de fútbol que utiliza inteligen
    python main.py -i tu_video.mp4
    ```
 
-¡Eso es todo! El video procesado se guardará automáticamente en `output_videos/tu_video_analyzed.mp4`
+El video procesado se guardará automáticamente en `output_videos/tu_video_analyzed.mp4`
 
 ### Ejemplos de Comandos
 
